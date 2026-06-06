@@ -5,106 +5,143 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Single Page Games</title>
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="grotesk.css">
 	<style>
-		:root {
-			--bg-color: #f4f4f9;
-			--card-bg: #fff;
-			--text-color: #333;
-			--subtext-color: #666;
-			--primary-color: #007bff;
-			--hover-color: #0056b3;
+		.page {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
 		}
 
-		body {
-			font-family: 'Roboto', sans-serif;
-			background-color: var(--bg-color);
+		.shell {
+			flex: 1;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			min-height: 100vh;
-			margin: 0;
-			padding: 1rem;
-			box-sizing: border-box;
+			padding: 48px 24px;
+			gap: 8px;
 		}
 
-		h1 {
-			margin-bottom: 0.5rem;
-			color: var(--text-color);
+		.shell .title {
+			font-family: var(--font-mark);
 			text-align: center;
 		}
 
-		p.subtitle {
-			color: var(--subtext-color);
-			margin-bottom: 3rem;
+		.shell .subtitle {
+			color: var(--text-dim);
+			font-size: 13px;
+			letter-spacing: 0.03em;
 			text-align: center;
-			max-width: 600px;
+			max-width: 560px;
+			margin-bottom: 36px;
 		}
 
 		.game-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-			gap: 20px;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 16px;
 			width: 100%;
-			max-width: 800px;
+			max-width: 720px;
 		}
 
 		.game-card {
-			background: var(--card-bg);
-			padding: 2rem;
-			border-radius: 10px;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			text-align: center;
-			transition: transform 0.2s, box-shadow 0.2s;
-			text-decoration: none;
-			color: inherit;
+			background: var(--panel-2);
+			padding: 28px 24px;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			text-align: center;
+			text-decoration: none;
+			color: var(--text);
+			border: 1px solid var(--line);
+			transition: border-color 180ms ease, transform 180ms ease;
 		}
 
 		.game-card:hover {
-			transform: translateY(-5px);
-			box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+			border-color: var(--signal);
+			transform: translateY(-3px);
+		}
+
+		/* Flat mode collapses the card surface to the base background. */
+		body[data-flat="true"] .game-card {
+			background: var(--bg);
 		}
 
 		.game-icon {
-			font-size: 3rem;
-			margin-bottom: 1rem;
+			font-size: 2.6rem;
+			line-height: 1;
+			margin-bottom: 14px;
 		}
 
 		.game-title {
-			font-size: 1.5rem;
-			font-weight: bold;
-			margin-bottom: 0.5rem;
-			color: var(--text-color);
+			font-size: 18px;
+			letter-spacing: 0.04em;
+			margin-bottom: 8px;
+		}
+
+		.game-card:hover .game-title {
+			color: var(--signal);
 		}
 
 		.game-desc {
-			color: var(--subtext-color);
-			font-size: 0.9rem;
+			color: var(--text-dim);
+			font-size: 12px;
+			letter-spacing: 0.03em;
+			line-height: 1.7;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.game-card {
+				transition: none;
+			}
 		}
 	</style>
 </head>
 
 <body>
-	<h1>Single Page Games</h1>
-	<p class="subtitle">A collection of single file games. Built with AI assistance.</p>
+	<main class="page frame">
+		<header class="topbar">
+			<div class="wordmark">APEX⁂</div>
+			<nav class="nav" aria-label="Primary">
+				<span class="on">/ Games</span>
+			</nav>
+			<div class="meta">
+				<button class="ui-switch" id="theme-toggle" type="button" role="switch" aria-checked="false">
+					<span class="switch-label">Theme</span>
+					<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+				</button>
+				<button class="ui-switch" id="flat-toggle" type="button" role="switch" aria-checked="false">
+					<span class="switch-label">Surfaces</span>
+					<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+				</button>
+			</div>
+		</header>
 
-	<div class="game-grid">
-		<a href="sudoku.html" class="game-card">
-			<div class="game-icon">🧩</div>
-			<div class="game-title">Sudoku</div>
-			<div class="game-desc">Fill the grid so that every row, column, and block contains 1-9.</div>
-		</a>
+		<section class="shell">
+			<h1 class="title">Single Page Games</h1>
+			<p class="subtitle">A collection of single-file games. Built with AI assistance.</p>
 
-		<a href="minesweeper.html" class="game-card">
-			<div class="game-icon">💣</div>
-			<div class="game-title">Minesweeper</div>
-			<div class="game-desc">Flag mines and reveal safe zones to clear the board.</div>
-		</a>
-	</div>
+			<div class="game-grid">
+				<a href="sudoku.html" class="game-card">
+					<div class="game-icon">🧩</div>
+					<div class="game-title">Sudoku</div>
+					<div class="game-desc">Fill the grid so that every row, column, and block contains 1–9.</div>
+				</a>
+
+				<a href="minesweeper.html" class="game-card">
+					<div class="game-icon">💣</div>
+					<div class="game-title">Minesweeper</div>
+					<div class="game-desc">Flag mines and reveal safe zones to clear the board.</div>
+				</a>
+			</div>
+		</section>
+	</main>
+
+	<script src="theme-toggle.js"></script>
 </body>
 
 </html>

@@ -5,116 +5,66 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Single Page Minesweeper</title>
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="grotesk.css">
 	<style>
-		:root {
-			--bg-color: #f4f4f9;
-			--grid-border: #333;
-			--cell-border: #ccc;
-			--highlight: #e8f0fe;
-			--error: #ffcccc;
-			--fixed-text: #000;
-			--covered-bg: #eee;
-			--revealed-bg: #fff;
-			--flag-color: #e67c73;
-			--mine-color: #d93025;
-			--text-color: #2c7be5;
+		.page {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
 		}
 
-		body {
-			font-family: 'Roboto', sans-serif;
-			background-color: var(--bg-color);
+		.shell {
+			flex: 1;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			min-height: 100vh;
+			padding: 32px 24px;
+			gap: 16px;
+		}
+
+		.shell .title {
+			font-family: var(--font-mark);
+			font-size: clamp(24px, 4vw, 36px);
 			margin: 0;
-			padding: 1rem;
-			box-sizing: border-box;
 		}
 
-		h1 {
-			margin-bottom: 0.5rem;
-			color: #333;
-		}
-
-		p {
-			color: #666;
-			margin-bottom: 2rem;
-			text-align: center;
-			max-width: 600px;
+		.nav a {
+			display: inline-flex;
+			align-items: center;
+			font-size: 12px;
+			text-decoration: none;
 		}
 
 		.controls {
-			margin-bottom: 1rem;
 			display: flex;
-			gap: 10px;
+			gap: 14px;
 			flex-wrap: wrap;
 			justify-content: center;
 			align-items: center;
 		}
 
+		.slider-group label {
+			color: var(--text-dim);
+		}
+
 		.instructions {
-			margin-bottom: 2rem;
 			text-align: center;
-			font-size: 0.9rem;
-			color: #555;
-		}
-
-		button {
-			padding: 0.5rem;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-			font-weight: bold;
-			transition: background 0.2s;
-			font-size: 0.9rem;
-		}
-
-		.btn-primary {
-			background-color: #007bff;
-			color: white;
-		}
-
-		.btn-primary:hover {
-			background-color: #0056b3;
-		}
-
-		.btn-secondary {
-			background-color: #6c757d;
-			color: white;
-		}
-
-		.btn-secondary:hover {
-			background-color: #545b62;
-		}
-
-		.btn-success {
-			background-color: #28a745;
-			color: white;
-		}
-
-		.btn-success:hover {
-			background-color: #218838;
-		}
-
-		.btn-danger {
-			background-color: #dc3545;
-			color: white;
-		}
-
-		.btn-danger:hover {
-			background-color: #c82333;
+			font-size: 12px;
+			letter-spacing: 0.03em;
+			line-height: 1.7;
+			color: var(--text-dim);
 		}
 
 		#minesweeper-board {
 			display: grid;
 			grid-template-columns: repeat(9, 40px);
 			grid-template-rows: repeat(9, 40px);
-			border: 2px solid var(--grid-border);
-			background: white;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			border: 1px solid var(--line-strong);
+			background: var(--panel);
 			user-select: none;
 			-webkit-user-select: none;
 			touch-action: manipulation;
@@ -133,14 +83,14 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			font-size: 1.2rem;
-			font-weight: bold;
-			border-right: 1px solid var(--cell-border);
-			border-bottom: 1px solid var(--cell-border);
+			font-size: 1.1rem;
+			font-weight: 700;
+			border-right: 1px solid var(--line);
+			border-bottom: 1px solid var(--line);
 			box-sizing: border-box;
 			cursor: pointer;
-			background-color: var(--covered-bg);
-			color: var(--text-color);
+			background-color: var(--panel-2);
+			color: var(--text);
 		}
 
 		.cell.last-col {
@@ -152,98 +102,122 @@
 		}
 
 		.cell.revealed {
-			background-color: var(--revealed-bg);
+			background-color: var(--bg);
 			cursor: default;
 		}
 
 		@media (hover: hover) {
 			.cell:not(.revealed):hover {
-				background-color: #ddd;
+				background-color: var(--bg-soft);
 			}
 		}
 
 		.cell.flagged {
-			color: var(--flag-color);
+			color: var(--text);
 		}
 
 		.cell.mine {
-			background-color: var(--mine-color);
-			color: white;
+			background-color: var(--danger);
+			color: #fff;
 		}
 
 		.cell.exploded {
-			background-color: var(--mine-color);
+			background-color: var(--danger);
 			color: #fff;
 		}
 
 		/* Number colors */
 		.val-1 {
-			color: #1976d2;
+			color: #4f9dff;
 		}
 
 		.val-2 {
-			color: #388e3c;
+			color: #4caf50;
 		}
 
 		.val-3 {
-			color: #d32f2f;
+			color: #ff6b6b;
 		}
 
 		.val-4 {
-			color: #7b1fa2;
+			color: #b388ff;
 		}
 
 		.val-5 {
-			color: #ff8f00;
+			color: #ffb74d;
 		}
 
 		.val-6 {
-			color: #0097a7;
+			color: #4dd0e1;
 		}
 
 		.val-7 {
-			color: #424242;
+			color: var(--text);
 		}
 
 		.val-8 {
-			color: #9e9e9e;
+			color: var(--text-dim);
 		}
 
 		#status {
-			margin-top: 15px;
-			font-weight: bold;
+			margin-top: 4px;
+			font-size: 13px;
+			letter-spacing: 0.03em;
 			height: 20px;
 			text-align: center;
+			color: var(--text-dim);
 		}
 	</style>
 </head>
 
 <body>
-	<h1>Minesweeper</h1>
+	<main class="page frame">
+		<header class="topbar">
+			<div class="wordmark">APEX⁂</div>
+			<nav class="nav" aria-label="Primary">
+				<a href="index.html" style="text-decoration:none"><span>/ Games</span></a>
+				<span class="on">/ Minesweeper</span>
+			</nav>
+			<div class="meta">
+				<button class="ui-switch" id="theme-toggle" type="button" role="switch" aria-checked="false">
+					<span class="switch-label">Theme</span>
+					<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+				</button>
+				<button class="ui-switch" id="flat-toggle" type="button" role="switch" aria-checked="false">
+					<span class="switch-label">Surfaces</span>
+					<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+				</button>
+			</div>
+		</header>
 
-	<div class="controls">
-		<button onclick="initGame()" class="btn-primary">New Game</button>
-		<div class="slider-group" style="display:flex; flex-direction:column; gap:5px; margin: 0 10px;">
-			<label for="sizeData" style="font-size: 0.8rem; font-weight:bold;">Size: <span id="sizeVal">9</span>x<span
-					id="sizeVal2">9</span></label>
-			<input type="range" id="sizeData" min="8" max="20" value="9" oninput="updateSettings()">
-		</div>
-		<div class="slider-group" style="display:flex; flex-direction:column; gap:5px; margin: 0 10px;">
-			<label for="diffData" style="font-size: 0.8rem; font-weight:bold;">Mines: <span
-					id="diffVal">10</span>%</label>
-			<input type="range" id="diffData" min="10" max="30" value="12" oninput="updateSettings()">
-		</div>
-	</div>
+		<section class="shell">
+			<h1 class="title">Minesweeper</h1>
 
-	<div class="instructions">
-		Click to reveal • Right-click to flag<br>
-		On mobile: Long-press to flag
-	</div>
+			<div class="controls">
+				<button onclick="initGame()" class="kbtn kbtn-primary">New Game</button>
+				<div class="slider-group" style="display:flex; flex-direction:column; gap:5px; margin: 0 10px;">
+					<label for="sizeData" style="font-size: 11px; letter-spacing: 0.03em;">Size: <span id="sizeVal">9</span>x<span
+							id="sizeVal2">9</span></label>
+					<input type="range" class="ui-range" id="sizeData" min="8" max="20" value="9" oninput="updateSettings()">
+				</div>
+				<div class="slider-group" style="display:flex; flex-direction:column; gap:5px; margin: 0 10px;">
+					<label for="diffData" style="font-size: 11px; letter-spacing: 0.03em;">Mines: <span
+							id="diffVal">10</span>%</label>
+					<input type="range" class="ui-range" id="diffData" min="10" max="30" value="12" oninput="updateSettings()">
+				</div>
+			</div>
 
-	<div id="minesweeper-board">
-	</div>
+			<div class="instructions">
+				Click to reveal • Right-click to flag<br>
+				On mobile: Long-press to flag
+			</div>
 
-	<div id="status"></div>
+			<div id="minesweeper-board">
+			</div>
+
+			<div id="status"></div>
+		</section>
+	</main>
 
 	<script>
 		const board = document.getElementById('minesweeper-board');
@@ -316,7 +290,7 @@
 			firstClick = true;
 			flagsPlaced = 0;
 			statusDiv.innerText = `Mines: ${MINES}`;
-			statusDiv.style.color = 'black';
+			statusDiv.style.color = 'var(--text-dim)';
 
 			for (let r = 0; r < ROWS; r++) {
 				let row = [];
@@ -512,7 +486,7 @@
 			gameOver = true;
 			if (win) {
 				statusDiv.innerText = "Congratulations! You won!";
-				statusDiv.style.color = "green";
+				statusDiv.style.color = "var(--signal)";
 				for (let r = 0; r < ROWS; r++) {
 					for (let c = 0; c < COLS; c++) {
 						if (grid[r][c].mine && !grid[r][c].flagged) {
@@ -524,7 +498,7 @@
 				}
 			} else {
 				statusDiv.innerText = "Game Over!";
-				statusDiv.style.color = "red";
+				statusDiv.style.color = "var(--danger)";
 				for (let r = 0; r < ROWS; r++) {
 					for (let c = 0; c < COLS; c++) {
 						if (grid[r][c].mine && !grid[r][c].revealed) {
@@ -533,13 +507,14 @@
 						}
 						// Mark wrongly flagged cells
 						if (!grid[r][c].mine && grid[r][c].flagged) {
-							grid[r][c].element.style.backgroundColor = '#ffcccc';
+							grid[r][c].element.style.backgroundColor = 'var(--danger)';
 						}
 					}
 				}
 			}
 		}
 	</script>
+	<script src="theme-toggle.js"></script>
 </body>
 
 </html>

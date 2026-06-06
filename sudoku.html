@@ -5,45 +5,54 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Single Page Sudoku</title>
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="grotesk.css">
 	<style>
-		:root {
-			--bg-color: #f4f4f9;
-			--grid-border: #333;
-			--cell-border: #ccc;
-			--highlight: #e8f0fe;
-			--error: #ffcccc;
-			--fixed-text: #000;
-			--user-text: #2c7be5;
+		.page {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
 		}
 
-		body {
-			font-family: 'Roboto', sans-serif;
-			background-color: var(--bg-color);
+		.shell {
+			flex: 1;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			min-height: 100vh;
+			padding: 32px 24px;
+			gap: 18px;
+		}
+
+		.game-head {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.game-head .title {
+			font-family: var(--font-mark);
+			font-size: clamp(24px, 4vw, 36px);
 			margin: 0;
-			padding: 1rem;
-			box-sizing: border-box;
 		}
 
-		h1 {
-			margin-bottom: 0.5rem;
-			color: #333;
-		}
-
-		p {
-			color: #666;
-			margin-bottom: 2rem;
+		.hint {
+			color: var(--text-dim);
+			font-size: 12px;
+			letter-spacing: 0.03em;
 			text-align: center;
-			max-width: 600px;
+		}
+
+		.nav a {
+			display: inline-flex;
+			align-items: center;
+			font-size: 12px;
+			text-decoration: none;
 		}
 
 		.controls {
-			margin-bottom: 1rem;
 			display: flex;
 			gap: 10px;
 			flex-wrap: wrap;
@@ -51,59 +60,12 @@
 			align-items: center;
 		}
 
-		button {
-			padding: 0.5rem;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-			font-weight: bold;
-			transition: background 0.2s;
-			font-size: 0.9rem;
-		}
-
-		.btn-primary {
-			background-color: #007bff;
-			color: white;
-		}
-
-		.btn-primary:hover {
-			background-color: #0056b3;
-		}
-
-		.btn-secondary {
-			background-color: #6c757d;
-			color: white;
-		}
-
-		.btn-secondary:hover {
-			background-color: #545b62;
-		}
-
-		.btn-success {
-			background-color: #28a745;
-			color: white;
-		}
-
-		.btn-success:hover {
-			background-color: #218838;
-		}
-
-		.btn-danger {
-			background-color: #dc3545;
-			color: white;
-		}
-
-		.btn-danger:hover {
-			background-color: #c82333;
-		}
-
 		#sudoku-board {
 			display: grid;
 			grid-template-columns: repeat(9, 40px);
 			grid-template-rows: repeat(9, 40px);
-			border: 2px solid var(--grid-border);
-			background: white;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			border: 1px solid var(--line-strong);
+			background: var(--panel);
 		}
 
 		@media (max-width: 500px) {
@@ -121,23 +83,25 @@
 			width: 100%;
 			height: 100%;
 			text-align: center;
-			font-size: 1.5rem;
+			font-family: var(--font-ui);
+			font-size: 1.4rem;
+			background: transparent;
 			border: none;
-			border-right: 1px solid var(--cell-border);
-			border-bottom: 1px solid var(--cell-border);
+			border-right: 1px solid var(--line);
+			border-bottom: 1px solid var(--line);
 			box-sizing: border-box;
 			outline: none;
-			color: var(--user-text);
+			color: var(--signal);
 			padding: 0;
 			margin: 0;
 		}
 
 		input:focus {
-			background-color: var(--highlight);
+			background-color: var(--panel-2);
 		}
 
 		input:nth-child(3n) {
-			border-right: 3px solid var(--grid-border);
+			border-right: 2px solid var(--line-strong);
 		}
 
 		input:nth-child(9n) {
@@ -146,7 +110,7 @@
 
 		input:nth-child(n+19):nth-child(-n+27),
 		input:nth-child(n+46):nth-child(-n+54) {
-			border-bottom: 3px solid var(--grid-border);
+			border-bottom: 2px solid var(--line-strong);
 		}
 
 		input:nth-child(n+73) {
@@ -154,34 +118,31 @@
 		}
 
 		.fixed {
-			background-color: #eee;
-			color: var(--fixed-text);
-			font-weight: bold;
+			background-color: var(--panel-2);
+			color: var(--text);
+			font-weight: 700;
 			pointer-events: none;
 		}
 
 		.error {
-			background-color: var(--error) !important;
+			background-color: var(--danger) !important;
+			color: #fff !important;
 		}
 
 		.mode-badge {
-			background: #333;
-			color: #fff;
-			padding: 4px 8px;
-			border-radius: 4px;
-			font-size: 0.8rem;
-			vertical-align: middle;
-			margin-left: 10px;
+			align-self: center;
 		}
 
 		#status {
-			margin-top: 15px;
-			font-weight: bold;
+			margin-top: 4px;
+			font-size: 13px;
+			letter-spacing: 0.03em;
 			height: 20px;
+			color: var(--text-dim);
 		}
 
 		.note {
-			color: #777;
+			color: var(--text-dim);
 			font-size: 0.6rem;
 			letter-spacing: 1px;
 			line-height: 40px;
@@ -197,30 +158,51 @@
 				justify-content: center;
 			}
 		}
-
-		.active-mode {
-			outline: 2px solid #007bff;
-		}
 	</style>
 </head>
 
 <body>
-	<h1>Sudoku <span id="mode-display" class="mode-badge">PLAY MODE</span></h1>
+	<main class="page frame">
+		<header class="topbar">
+			<div class="wordmark">APEX⁂</div>
+			<nav class="nav" aria-label="Primary">
+				<a href="index.html" style="text-decoration:none"><span>/ Games</span></a>
+				<span class="on">/ Sudoku</span>
+			</nav>
+			<div class="meta">
+				<button class="ui-switch" id="theme-toggle" type="button" role="switch" aria-checked="false">
+					<span class="switch-label">Theme</span>
+					<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+				</button>
+				<button class="ui-switch" id="flat-toggle" type="button" role="switch" aria-checked="false">
+					<span class="switch-label">Surfaces</span>
+					<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+				</button>
+			</div>
+		</header>
 
-	<div class="controls">
-		<button onclick="clearBoard()" class="btn-danger">Clear</button>
-		<button onclick="toggleMode()" class="btn-secondary" id="mode-btn">Switch to Edit Mode</button>
-		<button onclick="validateBoard()" class="btn-success">Check Board</button>
-		<button onclick="generateRandomBoard()" class="btn-primary">Random Game</button>
-		<button onclick="generateShareLink()" class="btn-primary">Share Link</button>
-	</div>
+		<section class="shell">
+			<div class="game-head">
+				<h1 class="title">Sudoku</h1>
+				<span id="mode-display" class="pill good mode-badge">PLAY MODE</span>
+			</div>
 
-	<p>Press 'n' to toggle note mode • Arrow keys to navigate</p>
+			<div class="controls">
+				<button onclick="clearBoard()" class="kbtn kbtn-danger">Clear</button>
+				<button onclick="toggleMode()" class="kbtn" id="mode-btn">Switch to Edit Mode</button>
+				<button onclick="validateBoard()" class="kbtn kbtn-primary">Check Board</button>
+				<button onclick="generateRandomBoard()" class="kbtn">Random Game</button>
+				<button onclick="generateShareLink()" class="kbtn">Share Link</button>
+			</div>
 
-	<div id="sudoku-board">
-	</div>
+			<p class="hint">Press 'n' to toggle note mode • Arrow keys to navigate</p>
 
-	<div id="status"></div>
+			<div id="sudoku-board">
+			</div>
+
+			<div id="status"></div>
+		</section>
+	</main>
 
 	<script>
 		const board = document.getElementById('sudoku-board');
@@ -401,6 +383,7 @@
 		function setEditMode() {
 			isEditMode = true;
 			modeDisplay.innerText = "EDIT MODE";
+			modeDisplay.className = "pill warn mode-badge";
 			modeBtn.innerText = "Switch to Play Mode";
 			statusDiv.innerText = "Enter the puzzle clues.";
 
@@ -413,6 +396,7 @@
 		function setPlayMode() {
 			isEditMode = false;
 			modeDisplay.innerText = "PLAY MODE";
+			modeDisplay.className = "pill good mode-badge";
 			modeBtn.innerText = "Switch to Edit Mode";
 			statusDiv.innerText = "Good luck!";
 
@@ -479,21 +463,21 @@
 			if (navigator.clipboard) {
 				navigator.clipboard.writeText(newUrl).then(() => {
 					statusDiv.innerText = "Link copied to clipboard!";
-					statusDiv.style.color = "green";
+					statusDiv.style.color = "var(--signal)";
 				}).catch(() => {
 					statusDiv.innerText = "URL updated. Copy from address bar.";
-					statusDiv.style.color = "#333";
+					statusDiv.style.color = "var(--text-dim)";
 				});
 			} else {
 				statusDiv.innerText = "URL updated. Copy from address bar.";
-				statusDiv.style.color = "#333";
+				statusDiv.style.color = "var(--text-dim)";
 			}
 		}
 
 		function validateBoard() {
 			// Reset errors
 			inputs.forEach(i => i.classList.remove('error'));
-			statusDiv.style.color = "black";
+			statusDiv.style.color = "var(--text-dim)";
 
 			let isValid = true;
 			let isFilled = true;
@@ -546,13 +530,13 @@
 
 			if (!isValid) {
 				statusDiv.innerText = "Conflicts found!";
-				statusDiv.style.color = "red";
+				statusDiv.style.color = "var(--danger)";
 			} else if (!isFilled) {
 				statusDiv.innerText = "Looks good, keep going!";
-				statusDiv.style.color = "#007bff";
+				statusDiv.style.color = "var(--text-dim)";
 			} else {
 				statusDiv.innerText = "Congratulations! Board is valid and complete.";
-				statusDiv.style.color = "green";
+				statusDiv.style.color = "var(--signal)";
 			}
 		}
 
@@ -563,34 +547,87 @@
 				input.classList.remove('fixed', 'error', 'note');
 			});
 
-			// Create a flat array for the grid
-			let grid = new Array(81).fill(0);
-			fillBoard(grid);
+			// 1. Generate a full, valid board
+			let fullGrid = new Array(81).fill(0);
+			fillBoard(fullGrid);
 
-			// Remove clues to create a puzzle
-			// Keep around 35 clues for a balanced game
-			const cluesCount = 35;
+			// 2. Try to remove numbers while maintaining a unique solution
+			let puzzleGrid = [...fullGrid];
 			let indices = Array.from({ length: 81 }, (_, i) => i);
 
-			// Shuffle indices
+			// Shuffle indices to remove random cells
 			for (let i = indices.length - 1; i > 0; i--) {
 				const j = Math.floor(Math.random() * (i + 1));
 				[indices[i], indices[j]] = [indices[j], indices[i]];
 			}
 
-			// Set of indices to keep
-			const indicesToKeep = new Set(indices.slice(0, cluesCount));
+			// We will try to remove as many as possible or until we hit a reasonable limit
+			// A very hard sudoku has ~17 clues, easy ~35.
+			// Checking uniqueness every step is expensive but necessary.
 
-			// Populate inputs
 			for (let i = 0; i < 81; i++) {
-				if (indicesToKeep.has(i)) {
-					inputs[i].value = grid[i];
+				const idx = indices[i];
+				const removedVal = puzzleGrid[idx];
+				puzzleGrid[idx] = 0;
+
+				// Check if there is still exactly one solution
+				// We don't need to find ALL solutions, just > 1 is bad.
+				const solutions = countSolutions([...puzzleGrid], 2);
+
+				if (solutions !== 1) {
+					// If not unique (or 0, though unlikely if started full), put it back
+					puzzleGrid[idx] = removedVal;
+				}
+			}
+
+			// Populate inputs with the final puzzle
+			for (let i = 0; i < 81; i++) {
+				if (puzzleGrid[i] !== 0) {
+					inputs[i].value = puzzleGrid[i];
+					inputs[i].classList.add('fixed');
+					inputs[i].readOnly = true;
 				}
 			}
 
 			setPlayMode();
-			statusDiv.innerText = "New random game generated!";
-			statusDiv.style.color = "#333";
+			statusDiv.innerText = "New game generated!";
+			statusDiv.style.color = "var(--text-dim)";
+		}
+
+		function countSolutions(grid, limit = 2) {
+			const findEmpty = (g) => {
+				for (let i = 0; i < 81; i++) {
+					if (g[i] === 0) return i;
+				}
+				return -1;
+			};
+
+			let count = 0;
+
+			const solve = (g) => {
+				const index = findEmpty(g);
+				if (index === -1) {
+					count++;
+					return;
+				}
+
+				const r = Math.floor(index / 9);
+				const c = index % 9;
+				const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+				for (let num of nums) {
+					if (count >= limit) return; // Optimization: Stop if we found enough solutions
+
+					if (isValidMove(g, index, num)) {
+						g[index] = num;
+						solve(g);
+						g[index] = 0;
+					}
+				}
+			};
+
+			solve(grid);
+			return count;
 		}
 
 		function fillBoard(grid) {
@@ -643,6 +680,7 @@
 			return true;
 		}
 	</script>
+	<script src="theme-toggle.js"></script>
 </body>
 
 </html>
